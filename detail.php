@@ -226,14 +226,14 @@
 	<div class="container">
 		<a href="./">Menu</a> <i class="bi bi-chevron-compact-right" style="font-size: 12px;"></i> #<?= $_GET['page'] ?></a>
 		<div class="row mt-3">
-			<div class="col-7">
+			<div class="col-lg-7 mb-3">
 				<img loading="lazy" src="http://amertateknologi.com/xuyuan/images/term-9-hd/1-9_<?= $_GET['page'] ?>.jpg">
 				<div class="d-block nav-slide">
 					<a class="float-start" href="?page=<?= $_GET['page'] - 1 ?>"><i class="bi bi-arrow-left"></i> Prev</a>
 					<a class="float-end" href="?page=<?= $_GET['page'] + 1 ?>">Next <i class="bi bi-arrow-right"></i></a>
 				</div>
 			</div>
-			<div class="col-5">
+			<div class="col-lg-5 mb-3">
 				<div class="chat-container">
 					<div class="chat-header">Lina Laoshi</div>
 					<div class="chat-body">
@@ -252,7 +252,7 @@
 					</div>
 					<div class="chat-footer">
 						<textarea class="input-chat" placeholder="Yuk tanya laoshi!"></textarea>
-						<i class="bi bi-send-fill"></i>
+						<i class="bi bi-send-fill" onclick="alert('fitur ini terbatas untuk user tertentu!')"></i>
 					</div>
 				</div>
 			</div>

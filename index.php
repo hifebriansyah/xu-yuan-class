@@ -49,7 +49,7 @@
 				$i = $_GET['page'] ?? 1;
 				for ($i; $i <= $len ; $i++) { 
 			?>
-				<div class="col-3 pb-4">
+				<div class="col-sm-6 col-md-3 pb-4">
 					<a href="detail.php?page=<?= $i ?>">
 						<img loading="lazy" src="http://amertateknologi.com/xuyuan/images/term-9-hd/1-9_<?= $i ?>.jpg">
 						<div>#<?= $i ?></div>
