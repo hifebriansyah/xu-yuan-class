@@ -1,0 +1,16 @@
+/vendor
+/node_modules
+/.env
+/.phpunit.result.cache
+/public/hot
+/public/storage
+/storage/*.key
+/.vscode
+/.idea
+/.env.*.local
+.env.local
+.env.testing
+.env.production
+/.docker
+.DS_Store
+Thumbs.db
