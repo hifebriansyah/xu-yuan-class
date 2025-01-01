@@ -10,9 +10,25 @@
 
 	require 'vendor/autoload.php';
 
+	if (session_status() == PHP_SESSION_NONE) {
+	    session_start();
+	}
+
 	$parsedown = new Parsedown();
 	$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 	$dotenv->load();
+
+	$sl = apcu_fetch('soft-limit');
+
+	if(!$sl) {
+		$sl = [];
+		apcu_store('soft-limit', $sl);
+	}
+
+	if(!isset($sl[session_id()])) {
+		$sl[session_id()] = $_ENV['SOFT_LIMIT'];
+		apcu_store('soft-limit', $sl);
+	}
 
 	$xc = apcu_fetch('xuyuan-chats');
 
@@ -28,7 +44,7 @@
 		    "id" => "1"
 		);
 
-		$ch = curl_init($_ENV['END_POINT']); // Replace with your API endpoint URL
+		$ch = curl_init($_ENV['END_POINT_VISION']);
 
 		// Set curl options
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -50,8 +66,7 @@
 	} else {
 		$response = $xc[$_GET['page']];
 	}
-
-	$lorem = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum volutpat lacinia bibendum. Sed at dolor sapien. Nulla vel tincidunt enim, ultricies sollicitudin felis. Cras consequat enim id diam fermentum, a imperdiet enim posuere. Duis nec libero diam. Praesent suscipit suscipit faucibus. Integer volutpat non lacus et auctor.";
+	
 	$lorem = "Maaf Aku sedang mengalami kendala!";
 ?>
 <!DOCTYPE html>
@@ -219,6 +234,10 @@
 		.nav-slide a {
 			padding: 12px 0px;
 		}
+
+		.pointer {
+			cursor: pointer;
+		}
 	</style>
 </head>
 <body>
@@ -235,7 +254,7 @@
 			</div>
 			<div class="col-lg-5 mb-3">
 				<div class="chat-container">
-					<div class="chat-header">Lina Laoshi</div>
+					<div class="chat-header">Lina Laoshi ( AI ) <span class="float-end">Sisa <span id="koin"><?= $sl[session_id()] ?></span> Koin</span></div>
 					<div class="chat-body">
 						<div class="chats me">
 							<div>
@@ -247,12 +266,15 @@
 							<div>
 								<div class="avatar"></div>
 							</div>
-							<div class="content" id="lina" onclick="speech()"><?= isset($response) ? $parsedown->text("Hai, ".$response->choices[0]->message->content) : $lorem ?></div>
+							<div class="content">
+								<div class="lina"><?= isset($response) ? $parsedown->text("Hai, ".$response->choices[0]->message->content) : $lorem ?></div>
+								<div onclick="speech(this)" class="float-end pointer"><i class="bi bi-soundwave"></i></div>
+							</div>
 						</div>
 					</div>
 					<div class="chat-footer">
-						<textarea class="input-chat" placeholder="Yuk tanya laoshi!"></textarea>
-						<i class="bi bi-send-fill" onclick="alert('fitur ini terbatas untuk user tertentu!')"></i>
+						<textarea class="input-chat" id="input-chat" placeholder="Yuk tanya laoshi!"></textarea>
+						<i class="bi bi-send-fill" onclick="chat(this)"></i>
 					</div>
 				</div>
 			</div>
@@ -260,13 +282,45 @@
 	</div>
 
 	<script type="text/javascript">
-		function speech(argument) {
-			const text = document.getElementById('lina').textContent;
-	        const speech = new SpeechSynthesisUtterance(text);
-	        speechSynthesis.cancel();
-	        speech.lang = 'id-ID';
-	        //speech.lang = 'zh-CN';
-	        window.speechSynthesis.speak(speech);
+		function speech(el) {
+			const speech = new SpeechSynthesisUtterance(el.previousElementSibling.textContent);
+			speech.lang = 'id-ID';
+			speechSynthesis.cancel();
+			window.speechSynthesis.speak(speech);
+		}
+
+		function chat(el) {
+
+			const text = document.getElementById('input-chat').value;
+
+			if(text) {
+				document.getElementById('koin').textContent--
+				el.removeAttribute('onclick');
+
+				document.getElementById('input-chat').value = '';
+
+				let chatElement = document.querySelector(".chats.me").cloneNode(true);
+				chatElement.querySelector(".content").innerHTML = text;
+				document.querySelector(".chat-body").innerHTML += chatElement.outerHTML;
+
+				const formData = new FormData();
+				formData.append('text', text);
+
+				fetch('./chat.php', {
+					method: 'POST',
+					credentials: 'include',
+					body: formData
+				})
+				.then(response => response.json())
+				.then(data => {
+					let chatElement = document.querySelector(".chats:not(.me)").cloneNode(true);
+					chatElement.querySelector(".lina").innerHTML = data.message || data.choices[0].message.content;
+					document.querySelector(".chat-body").innerHTML += chatElement.outerHTML;
+					document.querySelector(".chat-body").scrollTop = document.querySelector(".chat-body").scrollHeight;
+					el.setAttribute('onclick', 'chat(this)');
+				})
+				.catch(console.log);
+			}
 		}
 	</script>
 </body>
