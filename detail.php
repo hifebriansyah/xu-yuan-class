@@ -18,26 +18,16 @@
 	$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 	$dotenv->load();
 
-	$sl = apcu_fetch('soft-limit');
+	$sl = apcu_fetch('soft-limit:'.session_id());
 
 	if(!$sl) {
-		$sl = [];
-		apcu_store('soft-limit', $sl);
+		$sl = 100;
+		apcu_store('soft-limit:'.session_id(), 100, 0);
 	}
 
-	if(!isset($sl[session_id()])) {
-		$sl[session_id()] = $_ENV['SOFT_LIMIT'];
-		apcu_store('soft-limit', $sl);
-	}
-
-	$xc = apcu_fetch('xuyuan-chats');
+	$xc = apcu_fetch('xuyuan-chats:'.$_GET['page']);
 
 	if(!$xc) {
-		$xc = [];
-		apcu_store('xuyuan-chats', $xc);
-	}
-
-	if(!isset($xc[$_GET['page']])) {
 		$data = array(
 		    "content" => $_ENV['SYSTEM'],
 		    "image_url" => "http://amertateknologi.com/xuyuan/images/term-9/1-9_".$_GET['page'].".jpg",
@@ -58,13 +48,12 @@
 
 		if($response !== false) {
 		    $response = json_decode($response);
-		    $xc[$_GET['page']] = $response;
-			apcu_store('xuyuan-chats', $xc);
+			apcu_store('xuyuan-chats:'.$_GET['page'], $response, 0);
 		}
 
 		curl_close($ch);
 	} else {
-		$response = $xc[$_GET['page']];
+		$response = $xc;
 	}
 	
 	$lorem = "Maaf Aku sedang mengalami kendala!";
@@ -254,7 +243,7 @@
 			</div>
 			<div class="col-lg-5 mb-3">
 				<div class="chat-container">
-					<div class="chat-header">Lina Laoshi ( AI ) <span class="float-end">Sisa <span id="koin"><?= $sl[session_id()] ?></span> Koin</span></div>
+					<div class="chat-header">Lina Laoshi ( AI ) <span class="float-end">Sisa <span id="koin"><?= $sl ?></span> Koin</span></div>
 					<div class="chat-body">
 						<div class="chats me">
 							<div>
@@ -302,6 +291,7 @@
 				let chatElement = document.querySelector(".chats.me").cloneNode(true);
 				chatElement.querySelector(".content").innerHTML = text;
 				document.querySelector(".chat-body").innerHTML += chatElement.outerHTML;
+				document.querySelector(".chat-body").scrollTop = document.querySelector(".chat-body").scrollHeight;
 
 				const formData = new FormData();
 				formData.append('text', text);

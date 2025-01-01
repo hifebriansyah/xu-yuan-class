@@ -2,17 +2,17 @@
 header('Content-Type: application/json');
 require 'vendor/autoload.php';
 
-$sl = apcu_fetch('soft-limit');
+$sl = isset($_COOKIE['PHPSESSID'])
+	? apcu_fetch('soft-limit:'.$_COOKIE['PHPSESSID'])
+	: false;
 
-if(isset($_COOKIE['PHPSESSID']) && isset($sl[$_COOKIE['PHPSESSID']])) {
+if($sl) {
 	$data = array(
 	    "content" => $_POST['text'],
 	    "id" => $_COOKIE['PHPSESSID']
 	);
 
-	$sl = apcu_fetch('soft-limit');
-
-	if($sl[$_COOKIE['PHPSESSID']] > 0){
+	if($sl > 0){
 		$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 		$dotenv->load();
 
@@ -29,8 +29,8 @@ if(isset($_COOKIE['PHPSESSID']) && isset($sl[$_COOKIE['PHPSESSID']])) {
 		$response = curl_exec($ch);
 
 		curl_close($ch);
-		$sl[$_COOKIE['PHPSESSID']] -= 1;
-		apcu_store('soft-limit', $sl);
+		$sl -= 1;
+		apcu_store('soft-limit:'.$_COOKIE['PHPSESSID'], $sl, 0);
 
 		echo $response;
 	} else {
