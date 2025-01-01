@@ -7,16 +7,19 @@ $sl = isset($_COOKIE['PHPSESSID'])
 	: false;
 
 if($sl) {
-	$data = array(
-	    "content" => $_POST['text'],
-	    "id" => $_COOKIE['PHPSESSID']."-".$_POST['page']
-	);
+	$xc = apcu_fetch('xuyuan-chats:'.$_POST['page']);
 
-	if($sl > 0){
+	if(!$xc) {
 		$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 		$dotenv->load();
 
-		$ch = curl_init($_ENV['END_POINT_CHAT']); // Replace with your API endpoint URL
+		$data = array(
+		    "content" => $_ENV['SYSTEM'],
+		    "image_url" => "http://amertateknologi.com/xuyuan/images/term-9/1-9_".$_POST['page'].".jpg",
+		    "id" => "1"
+		);
+
+		$ch = curl_init($_ENV['END_POINT_VISION']);
 
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_POST, true);
@@ -27,15 +30,19 @@ if($sl) {
 
 		$response = curl_exec($ch);
 
-		curl_close($ch);
-		$sl -= 1;
-		apcu_store('soft-limit:'.$_COOKIE['PHPSESSID'], $sl, 0);
+		if($response !== false) {
+			apcu_store('xuyuan-chats:'.$_POST['page'], $response, 0);
+		}
 
-		echo $response;
+		curl_close($ch);
 	} else {
-		echo '{"error":"Maaf, koin kamu sudah habis.."}';	
+		$response = $xc;
 	}
 
+	echo $response
+		? $response
+		: '{"error":"Maaf Aku sedang mengalami kendala!"}';
 } else {
 	echo '{"error":"Not Allowed"}';
 }
+

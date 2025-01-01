@@ -1,0 +1,169 @@
+:root {
+	/* green */
+	--primary: rgb(1,104,170);
+	--secondary: #F7C204;
+	--accent: #00bfa5;
+}
+#detail-page .logo {
+	display: block;
+	margin: 32px auto;
+	width: 100px;
+	margin-bottom: 16px;
+}
+#detail-page .container img{
+	border: 1px solid var(--secondary);
+	padding: 5px;
+	max-width: 100%;
+	border-radius: 30px;
+}
+#detail-page .row a {
+	text-align: center;
+}
+#detail-page a {
+	color: var(--accent);
+	text-decoration: none !important;
+}
+#detail-page .chat-container {
+	border-radius: 8px;
+	overflow: hidden;
+	position: relative;
+}
+#detail-page .chat-container::before {
+	background-color: #d0d0d0;
+	content:' ';
+	display: inline-block;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	position: absolute;
+	opacity: 0.1;
+	background-image: url("download.svg");
+	z-index: -1;
+}
+#detail-page .chat-header {
+	padding: 16px;
+	background: var(--primary);
+	color: #fff;
+	margin-right: 8px;
+	width: 100%;
+}
+#detail-page .chat-body {
+	height: 400px;
+	overflow-y: scroll;
+	overflow-x: hidden;
+	padding: 8px 0;
+	border: 1px solid #ddd;
+}
+#detail-page .chat-footer {
+	background: #F4F7F9;
+	display: inline-flex;
+	width: 100%;
+	border: 1px solid #ddd;
+	border-top: none ;
+	border-radius: 0px 0px 8px 8px;
+}
+#detail-page .input-chat {
+	background: none;
+	border: none;
+	padding: 8px 16px;
+	flex-grow: 1;
+	height: 62px;
+    resize: none;
+	margin: 0;
+	display: block;
+	float: left;
+	margin-right: 8px;
+	padding-top: 18px;
+}
+#detail-page .input-chat:* {
+	border: none !important;
+	box-shadow: none !important;
+}
+#detail-page .chats {
+	padding: 8px 16px;
+	position: relative;
+	clear: both;
+}
+#detail-page .chats:after {
+	display: block;
+	content:' ';
+	clear: both;
+}
+#detail-page .chats .avatar {
+	width: 38px;
+	height: 38px;
+	background: red;
+	border-radius: 50px;
+	overflow: hidden;
+	position: absolute;
+	top: 18px;
+	background: url("lina.jpg") no-repeat;
+	background-size: cover;
+	left: 8px;
+}
+#detail-page .chats .content {
+	background: white;
+	padding: 16px;
+	border-radius: 16px;
+	border: 1px solid #f0f0f0;
+	float: left;
+	margin-left: 36px;
+	margin-right: 36px;
+}
+
+#detail-page .chats.me .content {
+	float: right;
+}
+
+#detail-page .chats.me .avatar {
+	margin-left: 16px;
+	margin-right: 0px;
+	left: unset;
+	right: 8px;
+	background: url("user.png") no-repeat;
+	background-size: cover;
+}
+
+#detail-page .chat-footer .bi::before {
+	font-size: 30px;
+	padding: 16px;
+	padding-right: 24px;
+	color: var(--accent);
+	cursor: pointer;
+}
+
+input:focus,
+textarea:focus,
+button:focus,
+select:focus {
+	outline: none;
+	box-shadow: none;
+}
+
+#detail-page .nav-slide a {
+	padding: 12px 0px;
+}
+
+#detail-page .pointer {
+	cursor: pointer;
+}
+
+ @keyframes rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.spin {
+	line-height: 8px;
+    text-align: center;
+    font-size: 16px;
+    height: 16px;
+    width: 16px;
+    display: block;
+    animation: rotate 1s linear infinite;
+}
