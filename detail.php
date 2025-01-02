@@ -49,9 +49,12 @@
 		<div class="row mt-3">
 			<div class="col-lg-7 mb-3">
 				<img loading="lazy" src="http://amertateknologi.com/xuyuan/images/term-9-hd/1-9_<?= $_GET['page'] ?>.jpg">
-				<div class="d-block nav-slide">
+				<div class="d-block nav-slide clearfix">
 					<a class="float-start" href="?page=<?= $_GET['page'] - 1 ?>"><i class="bi bi-arrow-left"></i> Prev</a>
 					<a class="float-end" href="?page=<?= $_GET['page'] + 1 ?>">Next <i class="bi bi-arrow-right"></i></a>
+				</div>
+				<div class="words">
+					<span onclick="speechWord(this)" class="word template border me-1 p-2 mb-1 d-inline-block pointer" style="border-radius: 30px;"><i class="bi bi-slash-circle spin"></i></span>
 				</div>
 			</div>
 			<div class="col-lg-5 mb-3">
@@ -70,7 +73,7 @@
 							</div>
 							<div class="content">
 								<div class="lina"><i class="bi bi-slash-circle spin"></i></div>
-								<div onclick="speech(this)" class="float-end pointer"><i class="bi bi-soundwave"></i></div>
+								<div onclick="speech(this)" class="float-end pointer d-none"><i class="bi bi-soundwave"></i></div>
 							</div>
 						</div>
 					</div>
@@ -87,6 +90,15 @@
 		function speech(el) {
 			const speech = new SpeechSynthesisUtterance(el.previousElementSibling.textContent);
 			speech.lang = 'id-ID';
+			speechSynthesis.cancel();
+			window.speechSynthesis.speak(speech);
+		}
+
+		function speechWord(el) {
+			const speech = new SpeechSynthesisUtterance(el.textContent);
+			speech.lang = 'zh-CN';
+			speech.rate = 0.2;
+			speech.pitch = 1.5;
 			speechSynthesis.cancel();
 			window.speechSynthesis.speak(speech);
 		}
@@ -133,7 +145,6 @@
 		}
 
 		function vision() {
-
 			let rand = "a"+Date.now()
 			let chatElement = document.querySelector(".chats.d-none").cloneNode(true);
 			chatElement.classList.remove("d-none")
@@ -155,10 +166,37 @@
 			.catch(console.log);
 		}
 
+		function word() {
+			const formData = new FormData();
+			formData.append('page', <?= $_GET['page'] ?>);
+
+			fetch('./word.php', {
+				method: 'POST',
+				credentials: 'include',
+				body: formData
+			})
+			.then(response => response.json())
+			.then(data => {
+				words = JSON.parse(data.choices[0].message.content)
+
+				words.forEach(function(word) {
+					document.querySelector(".word.template").classList.add("d-none")
+					let chatElement = document.querySelector(".word.template").cloneNode(true);
+					chatElement.innerHTML = word
+					chatElement.classList.remove("d-none")
+					document.querySelector(".words").innerHTML += chatElement.outerHTML;
+
+				})
+
+			})
+			.catch(console.log);
+		}
+
 		function parseMarkdown(md) {
 		    return md
-		        .replace(/^# (.*$)/gm, '<h1>$1</h1>')
-		        .replace(/^## (.*$)/gm, '<h2>$1</h2>')
+		        .replace(/^# (.*$)/gm, '<b>$1</b>')
+		        .replace(/^## (.*$)/gm, '<b>$1</b>')
+		        .replace(/^### (.*$)/gm, '<b>$1</b>')
 		        .replace(/\*\*(.*?)\*\*/gm, '<strong>$1</strong>')
 		        .replace(/\*(.*?)\*/gm, '<em>$1</em>')
 		        .replace(/^- (.*$)/gm, '<li>$1</li>')
@@ -167,6 +205,7 @@
 		}
 
 		vision();
+		word();
 	</script>
 </body>
 </html>
